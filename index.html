@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM Example</title>
+    <script>
+        // Define the Module object here
+        var Module = {
+            onRuntimeInitialized: function () {
+                Module._main(); // Call the main function in the WebAssembly module
+            }
+        };
+    </script>
+    <script src="simple.js"></script> <!-- Load the Emscripten-generated script -->
+</head>
+
+<body>
+</body>
+
+</html>

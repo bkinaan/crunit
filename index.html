@@ -6,17 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WASM Example</title>
     <script>
+
+
         // Define the Module object here
         var Module = {
+            stdinBuffer: "",
             onRuntimeInitialized: function () {
-                Module._main(); // Call the main function in the WebAssembly module
+                // Module._main(); // Call the main function in the WebAssembly module
+                console.log("WASM initialized")
+                // Simulate standard input/output
+                // Module.outputBuffer = "";
+                // Module.errorBuffer = "";
+                // Module.stdinBuffer = "";
             }
+
         };
+
+        Module.FS.read = function (stream, buffer, offset, length, position) {
+            // check for stream
+            if (!stream) {
+                console.log("stream is undefined")
+                return 0
+            }
+
+            // checks for stdin
+            if (stream.fd === 0) {
+                let input = Module.stdinBuffer;
+                console.log("Input length:")
+                console.log(input.length)
+                if (input.length > 0) {
+                    for (let i = 0; i < length && i < input.length; i++) {
+                        buffer[offset + i] = input.charCodeAt(i);
+                    }
+                    const bytesRead = Math.min(length, input.length);
+                    Module.stdinBuffer = input.slice(bytesRead);
+                    return bytesRead;
+                }
+                return 0
+            }
+            return originalFSRead(stream, buffer, offset, length, position);
+        }
+
+        // call main function
+        // Module._main();
+
+
+
+        // handle button click
+        function handleButtonClick() {
+            var input = document.getElementById('userInput').value;
+            Module.stdinBuffer = input + "\n";
+            Module._main();
+        }
+
     </script>
-    <script src="simple.js"></script> <!-- Load the Emscripten-generated script -->
+    <!-- Load the Emscripten-generated script -->
+    <script src="builds/build_5/hello.js"></script>
+    <!-- <script src="build/shell.js"></script> -->
+    <!-- <script src="index.js"></script> -->
 </head>
 
 <body>
+    <input type="number" id="userInput" placeholder="Enter your input">
+    <button onclick="handleButtonClick()">Submit</button>
 </body>
 
 </html>
